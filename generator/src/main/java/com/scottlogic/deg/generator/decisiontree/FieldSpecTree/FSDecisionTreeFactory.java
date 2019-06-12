@@ -34,8 +34,11 @@ public class FSDecisionTreeFactory implements DecisionTreeFactory {
             .flatMap(rule -> rule.constraints.stream())
             .collect(Collectors.toSet());
 
+        FSConstraintNode rootNode = convertAndConstraint(new AndConstraint(constraints), new HashMap<>());
+        if (rootNode == null) throw new ValidationException("Fully contradictory profile");
+
         return new DecisionTree(
-            convertAndConstraint(new AndConstraint(constraints), new HashMap<>()),
+            rootNode,
             profile.getFields(),
             profile.getDescription());
     }
@@ -45,28 +48,38 @@ public class FSDecisionTreeFactory implements DecisionTreeFactory {
 
         Optional<Map<Field, FieldSpec>> localFieldSpecs = constraintReducer.reduceConstraintsToRowSpec(constraintNodeDetails.atomics);
         if (!localFieldSpecs.isPresent()){
-            throw new ValidationException("AAAH, A CONTRADICTION, TODO DO HANDLE THIS");
+            return null;
         }
 
         Optional<Map<Field, FieldSpec>> combinedFieldSpecs = rowSpecMerger.merge(parentFieldSpecs, localFieldSpecs.get());
 
         if (!combinedFieldSpecs.isPresent()){
-            throw new ValidationException("AAAH, A CONTRADICTION, TODO DO HANDLE THIS");
+            return null;
         }
 
         Collection<FSDecisionNode> decisions = new ArrayList<>();
         for (OrConstraint decision : constraintNodeDetails.decisions) {
-            decisions.add(convertOrConstraint(decision, combinedFieldSpecs.get()));
+            FSDecisionNode decisionNode = convertOrConstraint(decision, combinedFieldSpecs.get());
+            if (decisionNode == null) {
+                return null;
+            }
+            decisions.add(decisionNode);
         }
 
         return new FSConstraintNode(combinedFieldSpecs.get(), decisions);
     }
 
     private FSDecisionNode convertOrConstraint(OrConstraint decision, Map<Field, FieldSpec> fieldFieldSpecMap) {
-       return new FSDecisionNode(
-           decision.subConstraints.stream()
-               .map(c -> convertAndConstraint(new AndConstraint(c), fieldFieldSpecMap)
-               ).collect(Collectors.toList()));
+        List<FSConstraintNode> options = decision.subConstraints.stream()
+            .map(c -> convertAndConstraint(new AndConstraint(c), fieldFieldSpecMap))
+            .filter(Objects::nonNull)
+            .collect(Collectors.toList());
+
+        if (options.isEmpty()) {
+            return null;
+        }
+
+        return new FSDecisionNode(options);
     }
 
     private OrConstraint convertToOr(ConditionalConstraint conditionalConstraint){
