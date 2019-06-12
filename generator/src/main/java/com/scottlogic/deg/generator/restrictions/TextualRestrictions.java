@@ -1,5 +1,6 @@
 package com.scottlogic.deg.generator.restrictions;
 
+import com.scottlogic.deg.common.util.Defaults;
 import com.scottlogic.deg.generator.generation.NoStringsStringGenerator;
 import com.scottlogic.deg.generator.generation.RegexStringGenerator;
 import com.scottlogic.deg.generator.generation.StringGenerator;
@@ -37,6 +38,13 @@ public class TextualRestrictions implements StringRestrictions {
         this.excludedLengths = excludedLengths;
         this.notMatchingRegex = notMatchingRegex;
         this.notContainingRegex = notContainingRegex;
+    }
+
+    public TextualRestrictions() {
+        this(0, Defaults.MAX_STRING_LENGTH,
+            Collections.emptySet(), Collections.emptySet(),
+            Collections.emptySet(), Collections.emptySet(),
+            Collections.emptySet());
     }
 
     @Override
