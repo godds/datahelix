@@ -829,8 +829,7 @@ Feature: User can specify that a field must be a valid ISIN (International Secur
     And foo is anything but null
     And foo is in set:
       | "NOPE"    |
-    Then the following data should be generated:
-      | foo         |
+    Then the profile is invalid because "Fully contradictory profile"
 
   Scenario: aValid RIC run against a length should be successful
     Given foo is a valid "RIC"

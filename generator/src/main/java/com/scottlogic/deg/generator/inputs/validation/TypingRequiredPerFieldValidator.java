@@ -82,7 +82,13 @@ public class TypingRequiredPerFieldValidator implements ProfileValidator {
             return false;
         }
 
-        return fieldSpec.getSetRestrictions() != null
-            || fieldSpec.getTypeRestrictions() != null;
+        if (fieldSpec.getSetRestrictions() != null){
+            return true;
+        }
+        if (fieldSpec.getTypeRestrictions() == null) {
+            return false;
+        }
+
+        return fieldSpec.getTypeRestrictions().getAllowedTypes().size() != 3;
     }
 }
