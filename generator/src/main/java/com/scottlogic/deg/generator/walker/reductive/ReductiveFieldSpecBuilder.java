@@ -1,5 +1,6 @@
 package com.scottlogic.deg.generator.walker.reductive;
 
+import com.scottlogic.deg.common.ValidationException;
 import com.scottlogic.deg.common.profile.Field;
 import com.scottlogic.deg.generator.decisiontree.FieldSpecTree.FSConstraintNode;
 import com.scottlogic.deg.generator.decisiontree.FieldSpecTree.FSDecisionNode;
@@ -17,7 +18,13 @@ public class ReductiveFieldSpecBuilder {
      * @return fieldSpec with mustContains restriction if not contradictory, otherwise Optional.empty()
      */
     public Set<FieldSpec> getDecisionFieldSpecs(FSConstraintNode rootNode, Field field) {
-        return getSpecsForConstraint(rootNode, field, new HashSet<>());
+        Set<FieldSpec> set = getSpecsForConstraint(rootNode, field, new HashSet<>());
+        if (set.isEmpty()) throw new ValidationException("fully contradictory fieldSpec");
+
+        if (set.size() == 1) return set;
+
+        set.remove(rootNode.getFieldSpecs().get(field));
+        return set;
     }
 
     public Set<FieldSpec> getSpecsForConstraint(FSConstraintNode rootNode, Field field, Set<FieldSpec> set){
