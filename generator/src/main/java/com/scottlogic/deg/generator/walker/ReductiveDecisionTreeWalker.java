@@ -70,11 +70,11 @@ public class ReductiveDecisionTreeWalker implements DecisionTreeWalker {
     }
 
     private Stream<DataBag> pruneTreeForNextValue(
-        FSConstraintNode tree,
-        ReductiveState reductiveState,
-        FixFieldStrategy fixFieldStrategy,
-        Field field,
-        DataBagValue fieldValue){
+            FSConstraintNode tree,
+            ReductiveState reductiveState,
+            FixFieldStrategy fixFieldStrategy,
+            Field field,
+            DataBagValue fieldValue){
 
         Merged<FSConstraintNode> reducedTree = treePruner.pruneConstraintNode(tree, field, fieldValue);
 

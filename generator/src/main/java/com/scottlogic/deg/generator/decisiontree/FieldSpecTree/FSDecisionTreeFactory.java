@@ -19,12 +19,12 @@ import com.scottlogic.deg.generator.reducer.ConstraintReducer;
 import java.util.*;
 import java.util.stream.Collectors;
 
-public class ProfileFSConstraintNodeFactory implements DecisionTreeFactory {
+public class FSDecisionTreeFactory implements DecisionTreeFactory {
     private final ConstraintReducer constraintReducer;
     private final RowSpecMerger rowSpecMerger;
 
     @Inject
-    public ProfileFSConstraintNodeFactory(ConstraintReducer constraintReducer, RowSpecMerger rowSpecMerger) {
+    public FSDecisionTreeFactory(ConstraintReducer constraintReducer, RowSpecMerger rowSpecMerger) {
         this.constraintReducer = constraintReducer;
         this.rowSpecMerger = rowSpecMerger;
     }

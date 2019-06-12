@@ -2,12 +2,10 @@ package com.scottlogic.deg.generator.walker.reductive.fieldselectionstrategy;
 
 import com.scottlogic.deg.generator.ConstraintBuilder;
 import com.scottlogic.deg.common.profile.Field;
-import com.scottlogic.deg.generator.decisiontree.DecisionTree;
 import com.scottlogic.deg.common.profile.Profile;
 import com.scottlogic.deg.common.profile.Rule;
 import com.scottlogic.deg.common.profile.constraints.Constraint;
 import com.scottlogic.deg.common.profile.RuleInformation;
-import com.scottlogic.deg.generator.decisiontree.FieldSpecTree.ProfileFSConstraintNodeFactory;
 import org.junit.Assert;
 import org.junit.jupiter.api.Test;
 
@@ -179,7 +177,7 @@ public class TestHierarchicalDependencyFixFieldStrategy {
         List<Rule> rules = Collections.singletonList(new Rule(new RuleInformation(), constraints));
         Profile profile = new Profile(fields, rules);
 return null;
-//        DecisionTree tree = new ProfileFSConstraintNodeFactory().analyse(profile);
+//        DecisionTree tree = new FSDecisionTreeFactory().analyse(profile);
 //
 //        FieldAppearanceFixingStrategy strategy =
 //            new FieldAppearanceFixingStrategy(tree.getRootNode());

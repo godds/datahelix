@@ -22,4 +22,9 @@ public class FSConstraintNode {
     public Map<Field, FieldSpec> getFieldSpecs() {
         return fieldSpecs;
     }
+
+    @Override
+    public String toString() {
+        return fieldSpecs.toString() + " " + decisions.size() + " decisions";
+    }
 }

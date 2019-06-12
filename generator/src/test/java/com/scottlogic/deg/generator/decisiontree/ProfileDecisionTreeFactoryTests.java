@@ -16,7 +16,7 @@
 //import com.scottlogic.deg.common.profile.RuleInformation;
 //import com.scottlogic.deg.generator.decisiontree.ConstraintNode;
 //import com.scottlogic.deg.generator.decisiontree.FieldSpecTree.FSConstraintNode;
-//import com.scottlogic.deg.generator.decisiontree.FieldSpecTree.ProfileFSConstraintNodeFactory;
+//import com.scottlogic.deg.generator.decisiontree.FieldSpecTree.FSDecisionTreeFactory;
 //import com.scottlogic.deg.generator.decisiontree.testutils.*;
 //import com.scottlogic.deg.generator.fieldspecs.FieldSpecFactory;
 //import com.scottlogic.deg.generator.fieldspecs.FieldSpecMerger;
@@ -43,7 +43,7 @@
 //
 //    private final List<Rule> rules = new ArrayList<>();
 //    private FSConstraintNode actualOutput;
-//    ProfileFSConstraintNodeFactory testObject = new ProfileFSConstraintNodeFactory(
+//    FSDecisionTreeFactory testObject = new FSDecisionTreeFactory(
 //        new ConstraintReducer(
 //            new FieldSpecFactory(
 //                new StringRestrictionsFactory()),
