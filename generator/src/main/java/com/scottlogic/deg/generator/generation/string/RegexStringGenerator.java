@@ -14,18 +14,6 @@ import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 public class RegexStringGenerator implements StringGenerator {
-    private static final Map<String, String> PREDEFINED_CHARACTER_CLASSES;
-
-    static {
-        Map<String, String> characterClasses = new HashMap<>();
-        characterClasses.put("\\\\d", "[0-9]");
-        characterClasses.put("\\\\D", "[^0-9]");
-        characterClasses.put("\\\\s", "[ \t\n\f\r]");
-        characterClasses.put("\\\\S", "[^ \t\n\f\r]");
-        characterClasses.put("\\\\w", "[a-zA-Z_0-9]");
-        characterClasses.put("\\\\W", "[^a-zA-Z_0-9]");
-        PREDEFINED_CHARACTER_CLASSES = Collections.unmodifiableMap(characterClasses);
-    }
 
     /**
      * Cache of all matching regex automatons, keyed on their regex
@@ -55,7 +43,7 @@ public class RegexStringGenerator implements StringGenerator {
         Map<String, Automaton> cache = matchFullString ? matchingRegexAutomatonCache : containingRegexAutomatonCache;
         Automaton generatedAutomaton = cache.containsKey(regexStr)
             ? cache.get(regexStr)
-            : createAutomaton(regexStr, matchFullString, cache);
+            : AutomatonUtils.createAutomaton(regexStr, matchFullString, cache);
 
         String prefix = matchFullString ? "" : "*";
         String suffix = matchFullString ? "" : "*";
@@ -69,29 +57,6 @@ public class RegexStringGenerator implements StringGenerator {
 
     private RegexStringGenerator(Automaton automaton, String regexRepresentation) {
         data = new RegexStruct(automaton, regexRepresentation);
-    }
-
-    /**
-     * Create an automaton and store its instance in the cache, keyed on the given regex
-     * The cache will vary based on &lt;matchFullString&gt;.
-     *
-     * The creation of an automaton is a time-consuming process, especially for more complex expressions.
-     *
-     * @param regexStr The string to create the automaton from
-     * @param matchFullString Whether the string represents a matchingRegex (true) or containingRegex (false) expression
-     * @param cache The cache to store the automaton instance in
-     * @return The created automaton
-     */
-    static Automaton createAutomaton(String regexStr, boolean matchFullString, Map<String, Automaton> cache) {
-        final String anchoredStr = convertEndAnchors(regexStr, matchFullString);
-        final String requotedStr = escapeCharacters(anchoredStr);
-        final RegExp bricsRegExp = expandShorthandClasses(requotedStr);
-
-        Automaton generatedAutomaton = bricsRegExp.toAutomaton();
-        generatedAutomaton.expandSingleton();
-
-        cache.put(regexStr, generatedAutomaton);
-        return generatedAutomaton;
     }
 
     @Override
@@ -227,48 +192,6 @@ public class RegexStringGenerator implements StringGenerator {
 
         return automaton().run(subject);
 
-    }
-
-    private static String escapeCharacters(String regex) {
-        final Pattern patternRequoted = Pattern.compile("\\\\Q(.*?)\\\\E");
-        final Pattern patternSpecial = Pattern.compile("[.^$*+?(){|\\[\\\\@]");
-        StringBuilder sb = new StringBuilder(regex);
-        Matcher matcher = patternRequoted.matcher(sb);
-        while (matcher.find()) {
-            sb.replace(matcher.start(), matcher.end(), patternSpecial.matcher(matcher.group(1)).replaceAll("\\\\$0"));
-        }
-        return sb.toString();
-    }
-
-    private static String convertEndAnchors(String regexStr, boolean matchFullString) {
-        final Matcher startAnchorMatcher = Pattern.compile("^\\^").matcher(regexStr);
-
-        if (startAnchorMatcher.find()) {
-            regexStr = startAnchorMatcher.replaceAll(""); // brics.RegExp doesn't use anchors - they're treated as literal ^/$ characters
-        } else if (!matchFullString) {
-            regexStr = ".*" + regexStr; // brics.RegExp only supports full string matching, so add .* to simulate it
-        }
-
-        final Matcher endAnchorMatcher = Pattern.compile("\\$$").matcher(regexStr);
-
-        if (endAnchorMatcher.find()) {
-            regexStr = endAnchorMatcher.replaceAll("");
-        } else if (!matchFullString) {
-            regexStr = regexStr + ".*";
-        }
-
-        return regexStr;
-    }
-
-    /*
-     * As the Briks regex parser doesn't recognise shorthand classes we need to convert them to character groups
-     */
-    private static RegExp expandShorthandClasses(String regex) {
-        String finalRegex = regex;
-        for (Map.Entry<String, String> charClass : PREDEFINED_CHARACTER_CLASSES.entrySet()) {
-            finalRegex = finalRegex.replaceAll(charClass.getKey(), charClass.getValue());
-        }
-        return new RegExp(finalRegex);
     }
 
     private String generateRandomStringInternal(
