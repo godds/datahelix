@@ -457,11 +457,9 @@ public class RegexStringGenerator implements StringGenerator {
 
         @Override
         public String next() {
-            try {
-                return currentValue;
-            } finally {
-                currentValue = null;
-            }
+            String result = currentValue;
+            currentValue = null;
+            return result;
         }
     }
 
