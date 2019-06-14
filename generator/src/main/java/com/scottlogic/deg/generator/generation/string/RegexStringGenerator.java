@@ -477,7 +477,7 @@ public class RegexStringGenerator implements StringGenerator {
      * @return true if the string parameter contains valid plane 0 unicode characters.
      *         false if it contains any surrogate characters.
      */
-    public boolean isStringValidUtf8(String str) {
+    static boolean isStringValidUtf8(String str) {
         for (char c : str.toCharArray()) {
             if (!isCharValidUtf8(c)) {
                 return false;
@@ -486,7 +486,7 @@ public class RegexStringGenerator implements StringGenerator {
         return true;
     }
 
-    public boolean isCharValidUtf8(char c) {
+    static boolean isCharValidUtf8(char c) {
         return !Character.isSurrogate(c);
     }
 
