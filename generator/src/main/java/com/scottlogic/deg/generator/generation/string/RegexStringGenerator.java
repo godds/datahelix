@@ -106,10 +106,6 @@ public class RegexStringGenerator implements StringGenerator {
     }
 
     public static RegexStringGenerator createFromBlacklist(Set<Object> blacklist) {
-        return RegexStringGenerator.createFromBlacklist(blacklist, new JavaUtilRandomNumberGenerator());
-    }
-
-    public static RegexStringGenerator createFromBlacklist(Set<Object> blacklist, RandomNumberGenerator random) {
         String[] blacklistStrings = blacklist.stream().map(Object::toString).toArray(String[]::new);
         Automaton automaton = Automaton.makeStringUnion(blacklistStrings).complement();
         RegexStruct dataStructure = new RegexStruct(automaton, String.format("NOT-IN %s", Objects.toString(blacklist)));
@@ -149,10 +145,6 @@ public class RegexStringGenerator implements StringGenerator {
 
     static String intersectRepresentation(String left, String right) {
         return String.format("(%s ∩ %s)", left, right);
-    }
-
-    static String unionRepresentation(String left, String right) {
-        return String.format("(%s ∪ %s)", left, right);
     }
 
     @Override
