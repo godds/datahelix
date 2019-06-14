@@ -63,6 +63,14 @@ public class RegexStringGenerator implements StringGenerator {
         data = new RegexStruct(generatedAutomaton, regexRepresentation);
     }
 
+    private RegexStringGenerator(RegexStruct data) {
+        this.data = data;
+    }
+
+    private RegexStringGenerator(Automaton automaton, String regexRepresentation) {
+        data = new RegexStruct(automaton, regexRepresentation);
+    }
+
     /**
      * Create an automaton and store its instance in the cache, keyed on the given regex
      * The cache will vary based on &lt;matchFullString&gt;.
@@ -86,10 +94,6 @@ public class RegexStringGenerator implements StringGenerator {
         return generatedAutomaton;
     }
 
-    private RegexStringGenerator(Automaton automaton, String regexRepresentation) {
-        data = new RegexStruct(automaton, regexRepresentation);
-    }
-
     @Override
     public String toString() {
         if (representation() != null)
@@ -108,8 +112,9 @@ public class RegexStringGenerator implements StringGenerator {
     public static RegexStringGenerator createFromBlacklist(Set<Object> blacklist, RandomNumberGenerator random) {
         String[] blacklistStrings = blacklist.stream().map(Object::toString).toArray(String[]::new);
         Automaton automaton = Automaton.makeStringUnion(blacklistStrings).complement();
+        RegexStruct dataStructure = new RegexStruct(automaton, String.format("NOT-IN %s", Objects.toString(blacklist)));
 
-        return new RegexStringGenerator(automaton, String.format("NOT-IN %s", Objects.toString(blacklist)));
+        return new RegexStringGenerator(dataStructure);
     }
 
     @Override
@@ -123,21 +128,12 @@ public class RegexStringGenerator implements StringGenerator {
         }
 
         RegexStringGenerator otherRegexGenerator = (RegexStringGenerator) otherGenerator;
-        Automaton b = otherRegexGenerator.automaton();
-        Automaton merged = automaton().intersection(b);
-        String mergedRepresentation = intersectRepresentation(representation(), otherRegexGenerator.representation());
 
-        return new RegexStringGenerator(merged, mergedRepresentation);
+        return new RegexStringGenerator(data.intersect(otherRegexGenerator.data));
     }
 
     public RegexStringGenerator union(RegexStringGenerator otherGenerator) {
-        Automaton b = otherGenerator.automaton();
-        Automaton merged = automaton().union(b);
-        String mergedRepresentation = unionRepresentation(
-            representation(),
-            otherGenerator.representation()
-        );
-        return new RegexStringGenerator(merged, mergedRepresentation);
+        return new RegexStringGenerator(data.union(otherGenerator.data));
     }
 
     @Override
