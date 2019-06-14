@@ -2,17 +2,13 @@ package com.scottlogic.deg.generator.generation.string;
 
 import com.scottlogic.deg.common.util.StringUtils;
 import com.scottlogic.deg.generator.generation.string.struct.RegexStruct;
-import com.scottlogic.deg.generator.utils.JavaUtilRandomNumberGenerator;
 import com.scottlogic.deg.generator.utils.RandomNumberGenerator;
 import com.scottlogic.deg.generator.utils.SupplierBasedIterator;
 import dk.brics.automaton.Automaton;
-import dk.brics.automaton.RegExp;
 import dk.brics.automaton.State;
 import dk.brics.automaton.Transition;
 
 import java.util.*;
-import java.util.regex.Matcher;
-import java.util.regex.Pattern;
 
 public class RegexStringGenerator implements StringGenerator {
 
@@ -461,7 +457,11 @@ public class RegexStringGenerator implements StringGenerator {
 
         @Override
         public String next() {
-            return currentValue;
+            try {
+                return currentValue;
+            } finally {
+                currentValue = null;
+            }
         }
     }
 
