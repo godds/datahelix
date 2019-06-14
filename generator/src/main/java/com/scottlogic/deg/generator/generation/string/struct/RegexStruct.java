@@ -5,7 +5,7 @@ import dk.brics.automaton.Automaton;
 import java.util.Objects;
 import java.util.function.Function;
 
-public class RegexStruct implements GenericStringStruct<Automaton> {
+public class RegexStruct  {
 
     private final Automaton automaton;
 
@@ -24,15 +24,15 @@ public class RegexStruct implements GenericStringStruct<Automaton> {
         return representation;
     }
 
-    public RegexStruct union(GenericStringStruct<Automaton> other) {
+    public RegexStruct union(RegexStruct other) {
         return combine(other, automaton::union, "∪");
     }
 
-    public RegexStruct intersect(GenericStringStruct<Automaton> other) {
+    public RegexStruct intersect(RegexStruct other) {
         return combine(other, automaton::intersection, "∩");
     }
 
-    private RegexStruct combine(final GenericStringStruct<Automaton> other,
+    private RegexStruct combine(final RegexStruct other,
                                 final Function<Automaton, Automaton> automatonMergeFunction,
                                 final String joinSymbol) {
         final Automaton mergedAutomaton = genericAutomaton(automatonMergeFunction, other.implementation());
