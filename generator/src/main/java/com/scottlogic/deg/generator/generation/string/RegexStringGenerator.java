@@ -1,5 +1,6 @@
 package com.scottlogic.deg.generator.generation.string;
 
+import com.scottlogic.deg.common.util.StringUtils;
 import com.scottlogic.deg.generator.generation.string.struct.RegexStruct;
 import com.scottlogic.deg.generator.utils.JavaUtilRandomNumberGenerator;
 import com.scottlogic.deg.generator.utils.RandomNumberGenerator;
@@ -244,7 +245,7 @@ public class RegexStringGenerator implements StringGenerator {
                     int diff = randomTransition.getMax() - randomTransition.getMin() + 1;
                     int randomOffset = diff > 0 ? random.nextInt(diff) : diff;
                     randomChar = (char) (randomOffset + randomTransition.getMin());
-                } while (!isCharValidUtf8(randomChar));
+                } while (!StringUtils.isCharValidUtf8(randomChar));
                 result = generateRandomStringInternal(strMatch + randomChar, randomTransition.getDest(), minLength, maxLength, random);
             }
         }
@@ -449,7 +450,7 @@ public class RegexStringGenerator implements StringGenerator {
                     return false;
                 }
                 currentValue = stringGenerator.getMatchedString(currentIndex);
-            } while (!isStringValidUtf8(currentValue));
+            } while (!StringUtils.isStringValidUtf8(currentValue));
             return currentValue != null;
         }
 
@@ -461,33 +462,6 @@ public class RegexStringGenerator implements StringGenerator {
                 currentValue = null;
             }
         }
-    }
-
-    /**
-     * <p>
-     * check to see if the character generated is a valid utf-8 single word value.
-     * </p>
-     * <p>
-     * from chapter 3.9, page 126 of `the Unicode Standard v11.0`
-     * (https://www.unicode.org/versions/Unicode11.0.0/ch02.pdf):
-     * </p>
-     * <code>Because surrogate code points are not Unicode scalar values, any UTF-8 byte
-     * sequence that would otherwise map to code points U+D800..U+DFFF is illformed.
-     * </code>
-     * @return true if the string parameter contains valid plane 0 unicode characters.
-     *         false if it contains any surrogate characters.
-     */
-    static boolean isStringValidUtf8(String str) {
-        for (char c : str.toCharArray()) {
-            if (!isCharValidUtf8(c)) {
-                return false;
-            }
-        }
-        return true;
-    }
-
-    static boolean isCharValidUtf8(char c) {
-        return !Character.isSurrogate(c);
     }
 
     public boolean equals(Object o) {
