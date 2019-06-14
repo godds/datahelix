@@ -1,6 +1,6 @@
 package com.scottlogic.deg.generator.restrictions;
 
-import com.scottlogic.deg.generator.generation.NoStringsStringGenerator;
+import com.scottlogic.deg.generator.generation.string.NoStringsStringGenerator;
 import com.scottlogic.deg.generator.generation.StringGenerator;
 
 /**

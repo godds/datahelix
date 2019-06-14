@@ -1,5 +1,6 @@
-package com.scottlogic.deg.generator.generation;
+package com.scottlogic.deg.generator.generation.string;
 
+import com.scottlogic.deg.generator.generation.StringGenerator;
 import com.scottlogic.deg.generator.utils.*;
 
 public class SedolStringGenerator extends ChecksummedCodeStringGenerator {

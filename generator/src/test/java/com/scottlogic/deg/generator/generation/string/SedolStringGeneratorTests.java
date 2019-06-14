@@ -1,5 +1,7 @@
-package com.scottlogic.deg.generator.generation;
+package com.scottlogic.deg.generator.generation.string;
 
+import com.scottlogic.deg.generator.generation.StringGenerator;
+import com.scottlogic.deg.generator.generation.string.SedolStringGenerator;
 import org.junit.Assert;
 import org.junit.jupiter.api.Test;
 
