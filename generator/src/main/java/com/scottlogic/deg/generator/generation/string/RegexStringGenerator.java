@@ -1,6 +1,7 @@
 package com.scottlogic.deg.generator.generation.string;
 
 import com.scottlogic.deg.generator.generation.StringGenerator;
+import com.scottlogic.deg.generator.generation.string.struct.RegexStruct;
 import com.scottlogic.deg.generator.utils.JavaUtilRandomNumberGenerator;
 import com.scottlogic.deg.generator.utils.RandomNumberGenerator;
 import com.scottlogic.deg.generator.utils.SupplierBasedIterator;
@@ -37,11 +38,19 @@ public class RegexStringGenerator implements StringGenerator {
      */
     private static final Map<String, Automaton> containingRegexAutomatonCache = new HashMap<>();
 
-    private Automaton automaton;
     private Node rootNode;
     private boolean isRootNodeBuilt;
     private int preparedTransactionNode;
-    private final String regexRepresentation;
+
+    private final RegexStruct data;
+
+    private Automaton automaton() {
+        return data.automaton();
+    }
+
+    private String representation() {
+        return data.representation();
+    }
 
     public RegexStringGenerator(String regexStr, boolean matchFullString) {
         Map<String, Automaton> cache = matchFullString ? matchingRegexAutomatonCache : containingRegexAutomatonCache;
@@ -51,8 +60,8 @@ public class RegexStringGenerator implements StringGenerator {
 
         String prefix = matchFullString ? "" : "*";
         String suffix = matchFullString ? "" : "*";
-        this.regexRepresentation = String.format("%s/%s/%s", prefix, regexStr, suffix);
-        this.automaton = generatedAutomaton;
+        String regexRepresentation = String.format("%s/%s/%s", prefix, regexStr, suffix);
+        data = new RegexStruct(generatedAutomaton, regexRepresentation);
     }
 
     /**
@@ -79,17 +88,16 @@ public class RegexStringGenerator implements StringGenerator {
     }
 
     private RegexStringGenerator(Automaton automaton, String regexRepresentation) {
-        this.automaton = automaton;
-        this.regexRepresentation = regexRepresentation;
+        data = new RegexStruct(automaton, regexRepresentation);
     }
 
     @Override
     public String toString() {
-        if (regexRepresentation != null)
-            return regexRepresentation;
+        if (representation() != null)
+            return representation();
 
-        if (this.automaton != null)
-            return this.automaton.toString();
+        if (automaton() != null)
+            return automaton().toString();
 
         return "<UNKNOWN>";
     }
@@ -116,19 +124,19 @@ public class RegexStringGenerator implements StringGenerator {
         }
 
         RegexStringGenerator otherRegexGenerator = (RegexStringGenerator) otherGenerator;
-        Automaton b = otherRegexGenerator.automaton;
-        Automaton merged = automaton.intersection(b);
-        String mergedRepresentation = intersectRepresentation(this.regexRepresentation, otherRegexGenerator.regexRepresentation);
+        Automaton b = otherRegexGenerator.automaton();
+        Automaton merged = automaton().intersection(b);
+        String mergedRepresentation = intersectRepresentation(representation(), otherRegexGenerator.representation());
 
         return new RegexStringGenerator(merged, mergedRepresentation);
     }
 
     public RegexStringGenerator union(RegexStringGenerator otherGenerator) {
-        Automaton b = otherGenerator.automaton;
-        Automaton merged = automaton.union(b);
+        Automaton b = otherGenerator.automaton();
+        Automaton merged = automaton().union(b);
         String mergedRepresentation = unionRepresentation(
-            this.regexRepresentation,
-            otherGenerator.regexRepresentation
+            representation(),
+            otherGenerator.representation()
         );
         return new RegexStringGenerator(merged, mergedRepresentation);
     }
@@ -136,8 +144,8 @@ public class RegexStringGenerator implements StringGenerator {
     @Override
     public StringGenerator complement() {
         return new RegexStringGenerator(
-            this.automaton.clone().complement(),
-            complementaryRepresentation(this.regexRepresentation));
+            automaton().clone().complement(),
+            complementaryRepresentation(representation()));
     }
 
     private static String complementaryRepresentation(String representation) {
@@ -154,14 +162,14 @@ public class RegexStringGenerator implements StringGenerator {
 
     @Override
     public boolean isFinite() {
-        return automaton.isFinite();
+        return automaton().isFinite();
     }
 
     @Override
     public Iterable<String> generateInterestingValues() {
         try {
-            String shortestString = AutomatonUtils.getShortestExample(automaton);
-            String longestString = AutomatonUtils.getLongestExample(automaton);
+            String shortestString = AutomatonUtils.getShortestExample(automaton());
+            String longestString = AutomatonUtils.getLongestExample(automaton());
 
             return shortestString.equals(longestString)
                 ? Collections.singleton(shortestString)
@@ -170,7 +178,7 @@ public class RegexStringGenerator implements StringGenerator {
             System.err.println(
                 String.format(
                     "Unable to generate interesting strings for %s\n%s",
-                    this.regexRepresentation,
+                    representation(),
                     e.getMessage()));
 
             return Collections.emptySet();
@@ -193,7 +201,7 @@ public class RegexStringGenerator implements StringGenerator {
         return () -> new SupplierBasedIterator<>(
             () -> generateRandomStringInternal(
                 "",
-                automaton.getInitialState(),
+                automaton().getInitialState(),
                 1,
                 Integer.MAX_VALUE,
                 randomNumberGenerator));
@@ -230,7 +238,7 @@ public class RegexStringGenerator implements StringGenerator {
     @Override
     public boolean match(String subject) {
 
-        return automaton.run(subject);
+        return automaton().run(subject);
 
     }
 
@@ -389,7 +397,7 @@ public class RegexStringGenerator implements StringGenerator {
         isRootNodeBuilt = true;
 
         rootNode = new RegexStringGenerator.Node();
-        List<RegexStringGenerator.Node> nextNodes = prepareTransactionNodes(automaton.getInitialState());
+        List<RegexStringGenerator.Node> nextNodes = prepareTransactionNodes(automaton().getInitialState());
         rootNode.setNextNodes(nextNodes);
         rootNode.updateMatchedStringIdx();
     }
@@ -577,11 +585,11 @@ public class RegexStringGenerator implements StringGenerator {
         if (o == null || getClass() != o.getClass())
             return false;
         RegexStringGenerator constraint = (RegexStringGenerator) o;
-        return this.automaton.equals(constraint.automaton);
+        return this.automaton().equals(constraint.automaton());
     }
 
     public int hashCode() {
-        return Objects.hash(this.automaton, this.getClass());
+        return Objects.hash(this.automaton(), this.getClass());
     }
 
     public static class UnionCollector
