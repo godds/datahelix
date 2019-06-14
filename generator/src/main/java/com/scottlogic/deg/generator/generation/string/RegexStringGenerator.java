@@ -1,6 +1,7 @@
 package com.scottlogic.deg.generator.generation.string;
 
 import com.scottlogic.deg.common.util.StringUtils;
+import com.scottlogic.deg.generator.generation.string.struct.GenericStringStruct;
 import com.scottlogic.deg.generator.generation.string.struct.RegexStruct;
 import com.scottlogic.deg.generator.utils.RandomNumberGenerator;
 import com.scottlogic.deg.generator.utils.SupplierBasedIterator;
@@ -26,7 +27,7 @@ public class RegexStringGenerator implements StringGenerator {
     private boolean isRootNodeBuilt;
     private int preparedTransactionNode;
 
-    private final RegexStruct data;
+    private final GenericStringStruct<Automaton> data;
 
     public RegexStringGenerator(String regexStr, boolean matchFullString) {
         Map<String, Automaton> cache = matchFullString ? matchingRegexAutomatonCache : containingRegexAutomatonCache;
@@ -40,7 +41,7 @@ public class RegexStringGenerator implements StringGenerator {
         data = new RegexStruct(generatedAutomaton, regexRepresentation);
     }
 
-    private RegexStringGenerator(RegexStruct data) {
+    private RegexStringGenerator(GenericStringStruct<Automaton> data) {
         this.data = data;
     }
 
@@ -49,7 +50,7 @@ public class RegexStringGenerator implements StringGenerator {
     }
 
     private Automaton automaton() {
-        return data.automaton();
+        return data.implementation();
     }
 
     private String representation() {
