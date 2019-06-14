@@ -32,14 +32,6 @@ public class RegexStringGenerator implements StringGenerator {
 
     private final RegexStruct data;
 
-    private Automaton automaton() {
-        return data.automaton();
-    }
-
-    private String representation() {
-        return data.representation();
-    }
-
     public RegexStringGenerator(String regexStr, boolean matchFullString) {
         Map<String, Automaton> cache = matchFullString ? matchingRegexAutomatonCache : containingRegexAutomatonCache;
         Automaton generatedAutomaton = cache.containsKey(regexStr)
@@ -60,13 +52,23 @@ public class RegexStringGenerator implements StringGenerator {
         data = new RegexStruct(automaton, regexRepresentation);
     }
 
+    private Automaton automaton() {
+        return data.automaton();
+    }
+
+    private String representation() {
+        return data.representation();
+    }
+
     @Override
     public String toString() {
-        if (representation() != null)
+        if (representation() != null) {
             return representation();
+        }
 
-        if (automaton() != null)
+        if (automaton() != null) {
             return automaton().toString();
+        }
 
         return "<UNKNOWN>";
     }
@@ -162,8 +164,9 @@ public class RegexStringGenerator implements StringGenerator {
 
     private String getMatchedString(int indexOrder) {
         buildRootNode();
-        if (indexOrder < 1)
+        if (indexOrder < 1) {
             throw new IllegalArgumentException("indexOrder must be >= 1");
+        }
 
         if (indexOrder > rootNode.matchedStringIdx) {
             return null;
@@ -270,7 +273,7 @@ public class RegexStringGenerator implements StringGenerator {
             }
         }
 
-        return transitions.size() == 0;
+        return transitions.isEmpty();
     }
 
     private String buildStringFromNode(RegexStringGenerator.Node node, int indexOrder) {
@@ -287,8 +290,9 @@ public class RegexStringGenerator implements StringGenerator {
             }
         }
         long passedStringNbrInChildNode = 0;
-        if (result.length() == 0)
+        if (result.isEmpty()) {
             passedStringNbrInChildNode = passedStringNbr;
+        }
         for (RegexStringGenerator.Node childN : node.getNextNodes()) {
             passedStringNbrInChildNode += childN.getMatchedStringIdx();
             if (passedStringNbrInChildNode >= indexOrder) {
@@ -303,8 +307,9 @@ public class RegexStringGenerator implements StringGenerator {
 
     private void buildRootNode() {
 
-        if (isRootNodeBuilt)
+        if (isRootNodeBuilt) {
             return;
+        }
         isRootNodeBuilt = true;
 
         rootNode = new RegexStringGenerator.Node();
@@ -374,7 +379,7 @@ public class RegexStringGenerator implements StringGenerator {
             if (isNbrMatchedStringUpdated) {
                 return;
             }
-            if (nextNodes.size() == 0) {
+            if (nextNodes.isEmpty()) {
                 matchedStringIdx = nbrChar;
             } else {
                 for (RegexStringGenerator.Node childNode : nextNodes) {
@@ -456,11 +461,7 @@ public class RegexStringGenerator implements StringGenerator {
 
         @Override
         public String next() {
-            try {
-                return currentValue;
-            } finally {
-                currentValue = null;
-            }
+            return currentValue;
         }
     }
 

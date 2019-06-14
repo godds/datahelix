@@ -2,6 +2,7 @@ package com.scottlogic.deg.generator.generation.string.struct;
 
 import dk.brics.automaton.Automaton;
 
+import java.util.Objects;
 import java.util.function.Function;
 
 public class RegexStruct {
@@ -50,4 +51,23 @@ public class RegexStruct {
         return String.format("(%s %s %s)", left, joiner, right);
     }
 
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+        RegexStruct that = (RegexStruct) o;
+        return Objects.equals(automaton, that.automaton);
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(automaton);
+    }
+
+    @Override
+    public String toString() {
+        return "RegexStruct{" +
+            "representation='" + representation + '\'' +
+            '}';
+    }
 }
