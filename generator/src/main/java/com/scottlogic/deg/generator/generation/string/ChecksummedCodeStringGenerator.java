@@ -13,7 +13,6 @@ public abstract class ChecksummedCodeStringGenerator implements StringGenerator 
     protected final boolean negate;
     protected final int prefixLength;
     protected final int codeLength;
-    protected boolean unfulfillable;
 
     public ChecksummedCodeStringGenerator(
         String generationPattern,
@@ -59,12 +58,6 @@ public abstract class ChecksummedCodeStringGenerator implements StringGenerator 
 
     public abstract int getLength();
 
-    @Override
-    public abstract StringGenerator complement();
-
-    @Override
-    public abstract boolean match(String subject);
-
     public String fixCheckDigit(String str) {
         char checkDigit = calculateCheckDigit(str);
         int codeLength = getLength();
@@ -79,13 +72,13 @@ public abstract class ChecksummedCodeStringGenerator implements StringGenerator 
     public StringGenerator intersect(StringGenerator stringGenerator) {
         if (stringGenerator instanceof ChecksummedCodeStringGenerator) {
             ChecksummedCodeStringGenerator otherGenerator =
-                (ChecksummedCodeStringGenerator)stringGenerator;
+                (ChecksummedCodeStringGenerator) stringGenerator;
             return intersect(otherGenerator.negate ?
                 otherGenerator.regexGenerator.complement() :
                 otherGenerator.regexGenerator);
         }
         if (stringGenerator instanceof RegexStringGenerator) {
-            return intersect((RegexStringGenerator)stringGenerator);
+            return intersect((RegexStringGenerator) stringGenerator);
         }
         return new NoStringsStringGenerator(
             RegexStringGenerator.intersectRepresentation(stringGenerator.toString(), "<checksummed string>")
@@ -99,7 +92,7 @@ public abstract class ChecksummedCodeStringGenerator implements StringGenerator 
                 RegexStringGenerator.intersectRepresentation(other.toString(), regexGenerator.toString())
             );
         }
-        return instantiate((RegexStringGenerator)intersection);
+        return instantiate((RegexStringGenerator) intersection);
     }
 
     abstract ChecksummedCodeStringGenerator instantiate(RegexStringGenerator generator);
