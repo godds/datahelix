@@ -17,7 +17,8 @@ public class JarExecuteTests {
 
         List<String> collectedOutput = collectOutputAndCloseProcess(p);
 
-        assertEquals(Arrays.asList("foo", "\"Generation successful\""), collectedOutput);
+        assertEquals(Arrays.asList("foo", "\"Generation successful\""), collectedOutput,
+            "Jar test failed. this might be because you have not built the jar. \n run Gradle Build");
     }
 
     @Test
@@ -26,7 +27,8 @@ public class JarExecuteTests {
 
         List<String> collectedOutput = collectOutputAndCloseProcess(p);
 
-        assertEquals(Arrays.asList("foo", "\"Generated successfully from file\""), collectedOutput);
+        assertEquals(Arrays.asList("foo", "\"Generated successfully from file\""), collectedOutput,
+            "Jar test failed. this might be because you have not built the jar. \n run Gradle Build");
     }
 
     private Process setupProcess(final String profile) throws IOException {
