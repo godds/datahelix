@@ -8,6 +8,7 @@ import com.scottlogic.deg.generator.fieldspecs.*;
 import com.scottlogic.deg.generator.generation.databags.DataBagValue;
 import com.scottlogic.deg.generator.reducer.ConstraintReducer;
 import com.scottlogic.deg.generator.restrictions.StringRestrictionsFactory;
+import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Test;
 
 import java.util.*;
@@ -389,6 +390,31 @@ class ReductiveTreePrunerTests {
         //Assert
         ConstraintNode expected = tree;
         assertThat(actual, sameBeanAs(expected));
+    }
+
+    // Both options contradict -> returns invalid tree
+    // Ignore until issue #1090 is resolved.
+    @Disabled
+    @Test
+    public void pruneConstraintNode_withFullyContradictoryTree_returnsContradictory() {
+        //Arrange
+        ConstraintNode tree = constraintNode()
+            .withDecision(
+                constraintNode()
+                    .where(field).isNull(),
+                constraintNode()
+                    .where(field).isNotNull())
+            .build();
+
+        Map<Field, FieldSpec> fieldSpecs = new HashMap<>();
+        fieldSpecs.put(field, FieldSpec.Empty);
+
+        //Act
+        Merged<ConstraintNode> actual = treePruner.pruneConstraintNode(tree, fieldSpecs);
+
+        //Assert
+        Merged<Object> expected = Merged.contradictory();
+        assertThat(actual.get(), sameBeanAs(expected));
     }
 
     private DataBagValue fieldValue() {
